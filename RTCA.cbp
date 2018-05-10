@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="RtCA" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Release">
+				<Option output="RtCA" prefix_auto="1" extension_auto="1" />
+				<Option object_output=".obj" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-fexpensive-optimizations" />
+					<Add option="-O3" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="comdlg32" />
+					<Add library="comctl32" />
+					<Add library="gdi32" />
+					<Add library="psapi" />
+					<Add library="ws2_32" />
+					<Add library="dnsapi" />
+					<Add library="crypt32" />
+					<Add library="iphlpapi" />
+					<Add library="wininet" />
+					<Add library="wldap32" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-fexpensive-optimizations" />
+			<Add option="-O3" />
+			<Add option="-Wextra" />
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="Registry.h" />
+		<Unit filename="RtCA.h" />
+		<Unit filename="RtCA.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Unit filename="configuration/gui_conf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="configuration/init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="configuration/proxy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="configuration/richedit_conf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/d3des.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/d3des.h" />
+		<Unit filename="crypt/des.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/des.h" />
+		<Unit filename="crypt/md5.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/md5_dgst.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/rc4.h" />
+		<Unit filename="crypt/rc4_enc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/rc4_skey.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/rev_mdp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="crypt/sha2.cpp" />
+		<Unit filename="crypt/sha2.h" />
+		<Unit filename="crypt/windows_users_hashs_registry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="export.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="files/LiteZip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="files/LiteZip.h" />
+		<Unit filename="files/proc_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="files/proc_registry_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="files/rootkit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="import.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc_cmd.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc_gui.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="proc_registry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sqlite/interface.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sqlite/interface.h" />
+		<Unit filename="sqlite/load_save.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sqlite/sqlite3.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sqlite/sqlite3.h" />
+		<Unit filename="suivie.txt" />
+		<Unit filename="tests/scan.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_android.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_antivirus.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_arp.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_chrome.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_clipboard.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_disk.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_dns.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_env.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_file.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_file_lnk.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_firefox.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_firewall.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_guide.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_ie.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_ldap.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_log.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_log_files.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_log_files_evt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_log_files_evtx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_network.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_pipe.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_prefetch.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_process.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_deleted_keys.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_mru.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_password.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_path.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_service.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_settings.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_shellbags.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_software.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_start.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_update.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_usb.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_userassist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_registry_users.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_route.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_share.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tests/test_task.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_clean.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_copy.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_copy/MBR_parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_copy/MFT_parser.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_copy/MFT_parser.h" />
+		<Unit filename="tools/tools_copy/shadow_copy.cpp" />
+		<Unit filename="tools/tools_copy/vsbackup.h" />
+		<Unit filename="tools/tools_copy/vss.h" />
+		<Unit filename="tools/tools_date.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_hexa.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_memory.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_network.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_network/_entetes.h" />
+		<Unit filename="tools/tools_process.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_registry.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_registry_recovery.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_remote_extract.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_screenshot.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_sqlite_ed.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_state.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="tools/tools_virustotal.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="version.h" />
+		<Extensions>
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+			<AutoVersioning>
+				<Scheme minor_max="100" build_max="1000" rev_max="1000" rev_rand_max="10" build_times_to_increment_minor="2000" />
+				<Settings autoincrement="1" date_declarations="0" use_define="0" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C" svn="0" svn_directory="Z:\SVN_Omnia\RTCA" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,701 @@
+//------------------------------------------------------------------------------
+// Projet RtCA          : Read to Catch All
+// Auteur               : Nicolas Hanteville
+// Site                 : https://github.com/omnia-projetcs/omnia-projetcs
+// Licence              : GPL V3
+//------------------------------------------------------------------------------
+#include "RtCA.h"
+//------------------------------------------------------------------------------
+ICON_APP            ICON DISCARDABLE "img/RTCA.ico"
+
+ICON_LANGUAGE_EN    ICON DISCARDABLE "img/Eng.ico"
+ICON_LANGUAGE_FR    ICON DISCARDABLE "img/Fr.ico"
+
+ICON_FOLDER         ICON DISCARDABLE "img/folder.ico"
+ICON_FILE           ICON DISCARDABLE "img/file.ico"
+ICON_FILE_BIN       ICON DISCARDABLE "img/file_bin.ico"
+ICON_FILE_DWORD     ICON DISCARDABLE "img/file_dword.ico"
+ICON_FILE_TXT       ICON DISCARDABLE "img/file_txt.ico"
+ICON_FILE_UNKNOW    ICON DISCARDABLE "img/file_unknow.ico"
+
+IDR_VERSION VERSIONINFO
+FILEVERSION RC_FILEVERSION
+PRODUCTVERSION RC_FILEVERSION
+FILETYPE 0x00000001
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "04090000"
+    BEGIN
+      VALUE "CompanyName", "https://github.com/omnia-projetcs/omnia-projetcs\0"
+      VALUE "OriginalFilename", "RtCA.exe\0"
+      VALUE "ProductName", "RtCA\0"
+      VALUE "Author", "Nicolas Hanteville\0"
+      VALUE "FileVersion", RC_FILEVERSION_STRING
+      VALUE "ProductVersion", RC_FILEVERSION_STRING
+    END
+  END
+END
+
+SQLITE_F RCDATA DEFAULT_SQLITE_FILE
+//------------------------------------------------------------------------------
+//ACCELERATORS
+//------------------------------------------------------------------------------
+MY_ACCEL ACCELERATORS
+BEGIN
+  "n"                                     ,IDM_NEW_SESSION      , CONTROL, VIRTKEY           //CTRL+n
+ // "N"                                     ,IDM_NEW_SESSION      , CONTROL, VIRTKEY           //CTRL+N
+
+  "s"                                     ,POPUP_E_CSV          , CONTROL, VIRTKEY           //CTRL+s
+ // "S"                                     ,POPUP_E_CSV          , CONTROL, VIRTKEY           //CTRL+S
+
+  "t"                                     ,IDM_STAY_ON_TOP      , ALT
+//  "T"                                     ,IDM_STAY_ON_TOP      , ALT
+
+  "h"                                     ,IDM_RTCA_HOME        , ALT
+ // "H"                                     ,IDM_RTCA_HOME        , ALT
+
+  "p"                                     ,IDM_TOOLS_PROCESS    , CONTROL, ALT, VIRTKEY
+ // "P"                                     ,IDM_TOOLS_PROCESS    , CONTROL, ALT, VIRTKEY
+
+  "d"                                     ,IDM_TOOLS_HEXA_READER    , CONTROL, ALT, VIRTKEY
+  //"D"                                     ,IDM_TOOLS_HEXA_READER    , CONTROL, ALT, VIRTKEY
+
+  "l"                                     ,IDM_TOOLS_SQLITE_ED    , CONTROL, ALT, VIRTKEY
+  //"L"                                     ,IDM_TOOLS_SQLITE_ED    , CONTROL, ALT, VIRTKEY
+
+  VK_F1                                   ,IDM_ABOUT              , VIRTKEY
+END
+//------------------------------------------------------------------------------
+//configuration dialogue
+//------------------------------------------------------------------------------
+DLG_CONF DIALOGEX 0,24,458,307
+CAPTION NOM_APPLI
+FONT 8,"Arial",0,0
+//STYLE 0x10C80800
+STYLE   0x10CF0800
+EXSTYLE 0x00000010
+BEGIN
+  CONTROL "",                           TRV_FILES         ,"SysTreeView32"  ,0x50010007|WS_TABSTOP,2,1,260,293,0x00000200
+  CONTROL "",                           TRV_TEST          ,"SysTreeView32"  ,0x50000101|WS_TABSTOP,266,1,190,213,0x00000200
+  CONTROL "Settings",                   GRP_CONF          ,"Button"         ,0x50000007,266,217,190,53
+  CONTROL "Enable ACL files check",     BT_ACL_FILE_CHK   ,"Button"         ,0x50010003|WS_TABSTOP,272,228,174,9
+  CONTROL "Enable ADS files search",    BT_ADS_FILE_CHK   ,"Button"         ,0x50010003|WS_TABSTOP,272,238,174,9
+  CONTROL "SHA256 files hash (slow)",   BT_SHA_FILE_CHK   ,"Button"         ,0x50010003|WS_TABSTOP,272,248,174,9
+  CONTROL "UTC/GMT",                    BT_UTC_CHK        ,"Button"         ,0x50010003|WS_TABSTOP,272,258,90,9
+ // CONTROL "Remote Access",              BT_RA_CHK         ,"Button"         ,0x50010003|WS_TABSTOP,370,248,80,9
+  CONTROL "File magic number",          BT_MAGIC_CHK      ,"Button"         ,0x50010003|WS_TABSTOP,370,258,80,9
+
+  CONTROL "Add session name:",          ST_NAME_SESSION   ,"Static"         ,0x50000000,370,228,80,9
+  CONTROL "",                           EDT_NAME_SESSION  ,"Edit"           ,0x50810080|WS_TABSTOP,370,248,174,9
+
+  CONTROL "Start",                      BT_START          ,"Button"         ,0x50010000|WS_TABSTOP,266,272,190,23
+  CONTROL "",                           DLG_CONF_SB       ,"msctls_statusbar32",0x50000000,0,265,554,12
+END
+//------------------------------------------------------------------------------
+//process dialogue
+//------------------------------------------------------------------------------
+DLG_PROCESS DIALOGEX 6,6,400,231
+CAPTION "Process"
+FONT 8,"Arial",0,0
+STYLE 0x00CF0800
+BEGIN
+  CONTROL ""              ,LV_VIEW              ,"SysListView32",0x40810089,0,0,400,231,0x00000200
+END
+//------------------------------------------------------------------------------
+//network raw capture dialogue
+//------------------------------------------------------------------------------
+DLG_NETWORK_SNIFF DIALOGEX 55,0,550,300
+FONT 8,"Ms Shell Dlg 2",400,0,1
+STYLE 0x00CF0800
+BEGIN
+  CONTROL ""                        ,DLG_NS_SNIFF_LB_FILTRE       ,"ListBox",0x50010141,2,1,100,273,0x00000200
+  CONTROL ""                        ,DLG_NS_LSTV                  ,"SysListView32",WS_BORDER|WS_TABSTOP|LVS_SINGLESEL|LVS_SHOWSELALWAYS|LVS_NOLABELWRAP| LVS_REPORT |WS_CHILD,2,1,546,273 // IP
+  CONTROL ""                        ,DLG_NS_LSTV_FILTRE           ,"SysListView32",WS_BORDER|WS_TABSTOP|LVS_SINGLESEL|LVS_SHOWSELALWAYS|LVS_NOLABELWRAP| LVS_REPORT |WS_CHILD,104,1,444,273
+  CONTROL ""                        ,DLG_NS_LSTV_PAQUETS          ,"SysListView32",WS_BORDER|WS_TABSTOP|LVS_SHOWSELALWAYS|LVS_NOLABELWRAP| LVS_REPORT | WS_VISIBLE|WS_CHILD|LVS_OWNERDRAWFIXED,104,1,444,273
+
+  CONTROL ""                        ,DLG_CONF_INTERFACE           ,"ComboBox",0x50210042|CBS_SIMPLE| WS_TABSTOP,306,53,240,50
+  CONTROL "Promiscuous"             ,DLG_NS_SNIFF_CHK_PROMISCUOUS ,"Button",0x50010003| WS_TABSTOP,118,286,74,9
+  CONTROL "IP"                      ,DLG_NS_SNIFF_CHK_DISCO       ,"Button",0x50010003| WS_TABSTOP,200,286,54,9
+  CONTROL "Save"                    ,DLG_NS_BT_SAVE               ,"Button",0x50010000| WS_TABSTOP,384,282,64,13
+  CONTROL "Start"                   ,DLG_NS_BT_START              ,"Button",0x50010000| WS_TABSTOP,454,276,94,22
+END
+//------------------------------------------------------------------------------
+DLG_REGISTRY_EXPLORER_FILE DIALOGEX 6,6,230,115
+FONT 8,"Ms Shell Dlg 2",400,0,1
+STYLE 0x00CA0800
+BEGIN
+  CONTROL "",DLG_REG_ED_NTUSER    ,"Edit",0x50810080,2,1,148,13,0x00000200
+  CONTROL "",DLG_REG_ED_SAM       ,"Edit",0x50810080,2,16,148,13,0x00000200
+  CONTROL "",DLG_REG_ED_SECURITY  ,"Edit",0x50810080,2,31,148,13,0x00000200
+  CONTROL "",DLG_REG_ED_SOFTWARE  ,"Edit",0x50810080,2,46,148,13,0x00000200
+  CONTROL "",DLG_REG_ED_SYSTEM    ,"Edit",0x50810080,2,61,148,13,0x00000200
+  CONTROL "",DLG_REG_ED_OTHER     ,"Edit",0x50810080,2,79,148,13,0x00000200
+
+  CONTROL "Add NTUSER.DAT"  ,DLG_REG_BT_NTUSER    ,"Button",0x50010000,152,1,76,13,0x00000200
+  CONTROL "Add SAM"         ,DLG_REG_BT_SAM       ,"Button",0x50010000,152,16,76,13,0x00000200
+  CONTROL "Add SECURITY"    ,DLG_REG_BT_SECURITY  ,"Button",0x50010000,152,31,76,13,0x00000200
+  CONTROL "Add SOFTWARE"    ,DLG_REG_BT_SOFTWARE  ,"Button",0x50010000,152,46,76,13,0x00000200
+  CONTROL "Add SYSTEM"      ,DLG_REG_BT_SYSTEM    ,"Button",0x50010000,152,61,76,13,0x00000200
+  CONTROL "Add Other file"  ,DLG_REG_BT_OTHER     ,"Button",0x50010000,152,79,76,13,0x00000200
+
+  //check recovery mode !
+  CONTROL "Recovery mode"   ,BT_REG_RECOVERY_MODE_CHK,"Button",0x50010003,2,94,120,13
+
+  //start
+  CONTROL "Start"           ,BT_REG_START,"Button",0x50010000,130,94,80,13
+END
+//------------------------------------------------------------------------------
+DLG_REGISTRY_EXPLORER_VIEW DIALOGEX 6,6,230,115
+FONT 8,"Ms Shell Dlg 2",400,0,1
+STYLE 0x00CF0800
+BEGIN
+  CONTROL ""                ,ED_SEARCH            ,"Edit",0x50010080,4,216,112,13,0x00000200
+  CONTROL "Search"          ,BT_SEARCH            ,"Button",0x50010000,208,216,74,13
+  CONTROL "Match case"      ,BT_SEARCH_MATCH_CASE ,"Button",0x50010003,2,94,120,13
+  CONTROL "Tree view"       ,BT_TREE_VIEW         ,"Button",0x50010000,208,216,74,13
+  CONTROL ""                ,TV_VIEW              ,"SysTreeView32",TVS_HASBUTTONS | TVS_HASLINES | TVS_LINESATROOT | WS_BORDER,4,3,226,233,0x00000200
+  CONTROL ""                ,LV_VIEW              ,"SysListView32",0x40810089,4,3,374,204,0x00000200
+  CONTROL ""                ,STB                  ,"msctls_statusbar32",0x50000000,0,219,378,12
+END
+//------------------------------------------------------------------------------
+DLG_DATE DIALOGEX 6,5,268,200//230
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00CA0000
+BEGIN
+  CONTROL ""                                        ,DLG_DATE_EDT_HEX ,"Edit",0x50010000,2,1,96,13,0x00000200
+  CONTROL ""                                        ,DLG_DATE_EDT_DEC ,"Edit",0x50010000,2,16,96,13,0x00000200
+  CONTROL "Hex -> Date"                             ,DLG_DATE_BT_HEX  ,"Button",0x50010000,102,1,48,13
+  CONTROL "Dec -> Date"                             ,DLG_DATE_BT_DEC ,"Button",0x50010000,102,16,48,13
+  CONTROL ""                                        ,DLG_DATE_CB_UTC,"ComboBox",0x50210203,156,1,108,78
+
+  CONTROL "HEX :"                                   ,0,"Static",0x50000000,2,35,20,9
+  CONTROL ""                                        ,DLG_DATE_EDT2,"Edit",0x50010800,22,33,108,13,0x00000200
+  CONTROL "DEC :"                                   ,0,"Static",0x50000000,134,35,20,9
+  CONTROL ""                                        ,DLG_DATE_EDT3,"Edit",0x50010800,158,33,108,13,0x00000200
+
+  CONTROL "FileTime/Windows 64 bit (Little Endian) :",0,"Static",0x50000002,4,51,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT4,"Edit",0x50010800,142,49,124,13,0x00000200
+  CONTROL "FileTime/Windows 6Create : 4 bit  (Big Endian) :" ,0,"Static",0x50000002,4,66,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT5,"Edit",0x50010800,142,64,124,13,0x00000200
+  CONTROL "time_t Unix 32 bit (Little Endian) :"    ,0,"Static",0x50000002,4,81,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT6,"Edit",0x50010800,142,79,124,13,0x00000200
+  CONTROL "time_t Unix 32 bit (Big Endian) :"       ,0,"Static",0x50000002,4,96,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT7,"Edit",0x50010800,142,94,124,13,0x00000200
+  CONTROL "Windows NT Time :"                       ,0,"Static",0x50000002,4,111,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT8,"Edit",0x50010800,142,109,124,13,0x00000200
+  CONTROL "Firefox :"                               ,0,"Static",0x50000002,4,126,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT9,"Edit",0x50010800,142,124,124,13,0x00000200
+  CONTROL "Unix Milisecond/Android :"               ,0,"Static",0x50000002,4,141,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT10,"Edit",0x50010800,142,139,124,13,0x00000200
+  CONTROL "MAC Absolute Time :"                     ,0,"Static",0x50000002,4,156,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT11,"Edit",0x50010800,142,154,124,13,0x00000200
+  CONTROL "HFS/HFS+ 32 bit (Big Endian) :"          ,0,"Static",0x50000002,4,171,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT12,"Edit",0x50010800,142,169,124,13,0x00000200
+  CONTROL "HFS/HFS+ 32 bit (Little Endian) :"       ,0,"Static",0x50000002,4,186,134,9
+  CONTROL ""                                        ,DLG_DATE_EDT13,"Edit",0x50010800,142,184,124,13,0x00000200
+END
+//------------------------------------------------------------------------------
+DLG_STATE DIALOGEX 6,6,553,276
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00CF0800
+BEGIN
+  CONTROL ""                                        ,DLG_STATE_LB_SESSION,"ListBox",0x50310149,2,1,122,96,0x00000200
+  CONTROL ""                                        ,DLG_STATE_LB_TEST,"ListBox",0x50310149,2,101,122,140,0x00000200
+  CONTROL "Load"                                    ,DLG_STATE_BT_LOAD,"Button",0x50010000,2,245,122,19
+
+  CONTROL "All"                                     ,DLG_STATE_BT_ALL,"Button",0x50010000,132,1,70,19
+  CONTROL "Critical"                                ,DLG_STATE_BT_CRITICAL,"Button",0x50010000,204,1,70,19
+  CONTROL "Log State"                               ,DLG_STATE_BT_LOG_STATE,"Button",0x50010000,276,1,70,19
+  CONTROL "2012/11/18 11:11:11"                     ,DLG_STATE_ED_TIME_1,"ComboBox",0x50210042,348,3,90,150
+
+  CONTROL "->"                                      ,0,"Static",0x50000000,442,5,6,9
+  CONTROL "2012/11/18 11:11:12"                     ,DLG_STATE_ED_TIME_2,"Edit",0x50010000,449,3,80,13,0x00000200
+  CONTROL "Filter"                                  ,DLG_STATE_BT_FILTER,"Button",0x50010000,532,3,20,14
+
+  CONTROL ""                                        ,DLG_STATE_LV_ALL,"SysListView32",0x50810089,128,22,422,241,0x00000200
+  CONTROL ""                                        ,DLG_STATE_LV_CRITICAL,"SysListView32",0x40810089,128,22,422,241,0x00000200
+  CONTROL ""                                        ,DLG_STATE_LV_LOG_STATE,"SysListView32",0x40810089,128,22,422,241,0x00000200
+  CONTROL ""                                        ,DLG_STATE_LV_FILTER,"SysListView32",0x40810089,128,22,422,241,0x00000200
+  CONTROL ""                                        ,DLG_STATE_SB,"msctls_statusbar32",0x50000000,0,265,554,12
+END
+//------------------------------------------------------------------------------
+DLG_SQLITE_EDITOR DIALOGEX 6,6,553,276
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00CF0800
+EXSTYLE 0x00000010
+BEGIN
+  CONTROL ""                                          ,DLG_SQL_ED_LB_TABLE,"ListBox",0x50310141,2,1,122,240,0x00000200
+  CONTROL "Load"                                      ,DLG_SQL_ED_BT_LOAD,"Button",0x50010000,2,245,60,19
+  CONTROL "Close"                                     ,DLG_SQL_ED_BT_CLOSE,"Button",0x50010000,64,245,60,19
+  CONTROL "SELECT * FROM table;"                      ,DLG_SQL_ED_ED_REQUEST,"Edit",0x50210004,128,1,402,91,0x00000200
+
+  CONTROL ""                                          ,DLG_SQL_ED_ED_SEARCH,"Edit",0x50010000,128,400,80,19,0x00000200
+  CONTROL "Search"                                    ,DLG_SQL_ED_BT_SEARCH,"Button",0x50010000,200,400,20,19
+
+  CONTROL "Send"                                      ,DLG_SQL_ED_BT_SEND,"Button",0x50010000,532,1,20,61
+  CONTROL "Models"                                    ,DLG_SQL_ED_BT_MODELS,"Button",0x50010000,532,1,22,28
+  CONTROL ""                                          ,DLG_SQL_ED_LV_RESPONSE,"SysListView32",0x50810089,128,94,422,170,0x00000200
+  CONTROL ""                                          ,DLG_SQL_ED_STATE_SB,"msctls_statusbar32",0x50000000,0,265,554,12
+END
+//------------------------------------------------------------------------------
+DLG_SQLITE_ED DIALOGEX 6,6,400,276
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00EE0800
+EXSTYLE 0x00000010
+BEGIN
+  CONTROL "Update"                                    ,DLG_SQL_ED_ED_REQUEST,"Button",0x50010000,5,5,50,18
+  CONTROL "Add"                                       ,DLG_SQL_ED_BT_SEND,"Button",0x50010000,100,5,50,18
+  CONTROL "Infos"                                     ,DLG_SQL_ED_BT_INFO,"Button",0x50010000,205,5,50,18
+  CONTROL ""                                          ,DLG_SQL_ED_STATE_SB,"msctls_statusbar32",0x50000000,0,265,554,12
+END
+//------------------------------------------------------------------------------
+DLG_SQLITE_ED_TABLE DIALOGEX 6,6,450,276
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00EA0800
+EXSTYLE 0x00000010
+BEGIN
+  CONTROL "Update"                                    ,DLG_SQL_ED_ED_REQUEST,"Button",0x50010000,5,5,50,18
+  CONTROL ""                                          ,DLG_SQL_ED_STATE_SB,"msctls_statusbar32",0x50000000,0,265,554,12
+END
+//------------------------------------------------------------------------------
+DLG_HEXA_READER DIALOGEX 6,5,800,265
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00CF0800
+EXSTYLE 0x00000010
+BEGIN
+  CONTROL "Load"                                      ,DLG_HEXA_BT_LOAD,"Button",0x50010000,2,1,60,11
+  CONTROL ""                                          ,DLG_HEXA_LV_INFOS,"SysListView32",0x50810089,2,14,122,212,0x00000200
+  CONTROL "Close"                                     ,DLG_HEXA_BT_CLOSE,"Button",0x50010000,64,1,60,11
+  CONTROL "Search\\Next"                              ,DLG_HEXA_BT_SEARCH,"Button",0x50010000,74,251,50,11
+  CONTROL ""                                          ,DLG_HEXA_EDT_SEARCH,"Edit",0x50010000,2,228,122,11,0x00000200
+  CONTROL "Unicode "                                  ,DLG_HEXA_CHK_UNICODE,"Button",0x50010003,4,241,54,9
+  CONTROL "Hexa"                                      ,DLG_HEXA_CHK_HEXA,"Button",0x50010003,4,252,54,9
+  CONTROL ""                                          ,DLG_HEXA_LV_HEXA,"SysListView32",0x50810089,126,1,426,262,0x00000200
+END
+//------------------------------------------------------------------------------
+DLG_PROXY DIALOGEX 6,5,165,75
+CAPTION "Proxy settings"
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00C80800
+BEGIN
+  CONTROL "Use advanced proxy settings"               ,PROXY_CHK_USE,"Button",0x50010003,2,1,110,9
+  CONTROL "Proxy auto settings"                       ,PROXY_CHK_AUTOCONF,"Button",0x58010003,2,12,110,9
+  CONTROL "Save proxy settings"                       ,PROXY_CHK_SAVE,"Button",0x50010003,2,24,110,9
+  CONTROL "OK"                                        ,PROXY_BT_OK,"Button",0x50010000,116,1,48,20
+
+  CONTROL "Proxy:"                                    ,PROXY_ST_PROXY,"Static",0x50000000,2,36,26,9
+  CONTROL "http://proxy:8080"                         ,PROXY_ED_PROXY,"Edit",0x58010004,32,34,130,13,0x00000200
+
+  CONTROL "User:"                                     ,PROXY_ST_USER,"Static",0x50000000,2,50,34,9
+  CONTROL ""                                          ,PROXY_ED_USER,"Edit",0x58010004,40,48,122,13,0x00000200
+
+  CONTROL "Password:"                                 ,PROXY_ST_PASSWORD,"Static",0x50000000,2,63,34,9
+  CONTROL ""                                          ,PROXY_ED_PASSWORD,"Edit",0x580100A0,40,61,122,13,0x00000200
+END
+//------------------------------------------------------------------------------
+DLG_INFO DIALOGEX 6,6,480,260
+CAPTION "Information"
+FONT 8,"MS Sans Serif",0,0
+STYLE 0x00CF0800
+EXSTYLE 0x00000008
+BEGIN
+  CONTROL "",DLG_INFO_TXT,"RichEdit20A",0x563100C4,0,0,194,102,0x00000200
+END
+//------------------------------------------------------------------------------
+MY_MENU MENU
+BEGIN
+  POPUP "File"    //0
+  BEGIN
+    MENUITEM "&New session\tCtrl+N"       ,IDM_NEW_SESSION
+    MENUITEM "Refresh session list"       ,IDM_REFRESH_SESSION
+    MENUITEM SEPARATOR
+    POPUP    "Save all results"
+    BEGIN
+      MENUITEM "&*.csv\tCtrl+S"           ,POPUP_E_CSV
+      MENUITEM "*.html"                   ,POPUP_E_HTML
+      MENUITEM "*.xml"                    ,POPUP_E_XML
+    END
+    MENUITEM SEPARATOR
+    MENUITEM "Delete current session"     ,IDM_DEL_SESSION
+    MENUITEM "Delete all sessions"        ,IDM_DEL_ALL_SESSION
+    MENUITEM SEPARATOR
+    MENUITEM "Load an other database"     ,IDM_LOAD_OTHER_BDD
+    MENUITEM "Merge to database"          ,IDM_LOAD_SESSION_FILE
+    MENUITEM "Save database"              ,IDM_SAVE_SESSION_FILE
+    MENUITEM SEPARATOR
+    MENUITEM "Quit"                       ,IDM_QUIT
+  END
+  POPUP "Settings"  //1
+  BEGIN
+    MENUITEM "&Stay on top\tAlt+T"        ,IDM_STAY_ON_TOP
+    MENUITEM "Search match case"          ,BT_SEARCH_MATCH_CASE
+    MENUITEM "Desactivate the grid"       ,BT_DISABLE_GRID
+    MENUITEM SEPARATOR
+    MENUITEM "Screenshot"                 ,BT_SREEENSHOT
+    MENUITEM "Proxy"                      ,BT_PROXY
+    MENUITEM SEPARATOR
+    MENUITEM "SQLite FULL SPEED"          ,BT_SQLITE_FULL_SPEED
+    MENUITEM "Disable File auto update Time"    ,BT_ENABLE_DATE_NO_UPDATE
+    MENUITEM "Disable File list on USB & Share" ,BT_DISABLE_USB_SHARE_LIST
+  END
+  POPUP "Tools"     //2
+  BEGIN
+    MENUITEM "Copy all registry files"    ,IDM_TOOLS_CP_REGISTRY
+    MENUITEM "Copy all audit files"       ,IDM_TOOLS_CP_AUDIT
+    MENUITEM "Copy NTDIS.DIT(AD) file"    ,IDM_TOOLS_CP_AD
+    MENUITEM "Copy specific file"         ,IDM_TOOLS_CP_FILE
+    MENUITEM "Save all local datas to ZIP file"         ,IDM_TOOLS_GLOBAL_COPY
+    POPUP "DD"
+    BEGIN
+      MENUITEM "DD A:\\"    ,IDM_TOOLS_CP_DRIVE_A
+      MENUITEM "DD B:\\"    ,IDM_TOOLS_CP_DRIVE_B
+      MENUITEM "DD C:\\"    ,IDM_TOOLS_CP_DRIVE_C
+      MENUITEM "DD D:\\"    ,IDM_TOOLS_CP_DRIVE_D
+      MENUITEM "DD E:\\"    ,IDM_TOOLS_CP_DRIVE_E
+      MENUITEM "DD F:\\"    ,IDM_TOOLS_CP_DRIVE_F
+      MENUITEM "DD G:\\"    ,IDM_TOOLS_CP_DRIVE_G
+      MENUITEM "DD H:\\"    ,IDM_TOOLS_CP_DRIVE_H
+      MENUITEM "DD I:\\"    ,IDM_TOOLS_CP_DRIVE_I
+      MENUITEM "DD J:\\"    ,IDM_TOOLS_CP_DRIVE_J
+      MENUITEM "DD K:\\"    ,IDM_TOOLS_CP_DRIVE_K
+      MENUITEM "DD L:\\"    ,IDM_TOOLS_CP_DRIVE_L
+      MENUITEM "DD M:\\"    ,IDM_TOOLS_CP_DRIVE_M
+      MENUITEM "DD N:\\"    ,IDM_TOOLS_CP_DRIVE_N
+      MENUITEM "DD O:\\"    ,IDM_TOOLS_CP_DRIVE_O
+      MENUITEM "DD P:\\"    ,IDM_TOOLS_CP_DRIVE_P
+      MENUITEM "DD Q:\\"    ,IDM_TOOLS_CP_DRIVE_Q
+      MENUITEM "DD R:\\"    ,IDM_TOOLS_CP_DRIVE_R
+      MENUITEM "DD S:\\"    ,IDM_TOOLS_CP_DRIVE_S
+      MENUITEM "DD T:\\"    ,IDM_TOOLS_CP_DRIVE_T
+      MENUITEM "DD U:\\"    ,IDM_TOOLS_CP_DRIVE_U
+      MENUITEM "DD V:\\"    ,IDM_TOOLS_CP_DRIVE_V
+      MENUITEM "DD W:\\"    ,IDM_TOOLS_CP_DRIVE_W
+      MENUITEM "DD X:\\"    ,IDM_TOOLS_CP_DRIVE_X
+      MENUITEM "DD Y:\\"    ,IDM_TOOLS_CP_DRIVE_Y
+      MENUITEM "DD Z:\\"    ,IDM_TOOLS_CP_DRIVE_Z
+      MENUITEM SEPARATOR
+      MENUITEM "DD MBR \\\\.\\PhysicalDrive0",IDM_TOOLS_CP_MBR
+      MENUITEM "DD \\\\.\\PhysicalDrive0"    ,IDM_TOOLS_CP_DISK_0
+      MENUITEM "DD \\\\.\\PhysicalDrive1"    ,IDM_TOOLS_CP_DISK_1
+      MENUITEM "DD \\\\.\\PhysicalDrive2"    ,IDM_TOOLS_CP_DISK_2
+      MENUITEM "DD \\\\.\\PhysicalDrive3"    ,IDM_TOOLS_CP_DISK_3
+    END
+    MENUITEM SEPARATOR
+    MENUITEM "&List of process\t Ctrl+Alt+P"  ,IDM_TOOLS_PROCESS
+    MENUITEM "Registry explorer"              ,IDM_TOOLS_REG_EXPLORER
+    MENUITEM "Network live capture"           ,IDM_TOOLS_SNIFF
+    MENUITEM "&Decode date\t Ctrl+Alt+D"      ,IDM_TOOLS_DATE
+    MENUITEM "Hexa reader"                    ,IDM_TOOLS_HEXA_READER
+    MENUITEM "&SQLITE ED\t Ctrl+Alt+L"        ,IDM_TOOLS_SQLITE_ED
+    MENUITEM SEPARATOR
+    MENUITEM "Global analyser"                ,IDM_TOOLS_ANALYSER
+  END
+  POPUP "Help"      //3
+  BEGIN
+    MENUITEM "Update database"           ,IDM_RTCA_UPDATE
+    MENUITEM SEPARATOR
+    MENUITEM "&Open RtCA home\tAlt+H"     ,IDM_RTCA_HOME
+    MENUITEM SEPARATOR
+    MENUITEM "&About\tF1"                 ,IDM_ABOUT
+  END
+END
+//------------------------------------------------------------------------------
+//popup files menu
+//------------------------------------------------------------------------------
+POPUP_LSTV_HEXA MENU DISCARDABLE
+BEGIN
+  POPUP "POPUP_LSTV_HEXA"
+  BEGIN
+    MENUITEM "Copy the line to clipboard",POPUP_CP_LINE
+    MENUITEM "Copy the line hexa to clipboard",POPUP_CP_LINE_HEXA
+    MENUITEM "Copy the line string to clipboard",POPUP_CP_LINE_STRING
+  END
+END
+//------------------------------------------------------------------------------
+//popup files menu
+//------------------------------------------------------------------------------
+POPUP_TRV_FILES MENU DISCARDABLE
+BEGIN
+  POPUP "POPUP_TRV_FILES"
+  BEGIN
+    MENUITEM "Add file"                   ,POPUP_TRV_FILES_ADD_FILE
+    MENUITEM "Add path"                   ,POPUP_TRV_FILES_ADD_PATH
+    MENUITEM SEPARATOR
+    MENUITEM "Item UP"                    ,POPUP_TRV_FILES_UP
+    MENUITEM "Item DOWN"                  ,POPUP_TRV_FILES_DOWN
+    MENUITEM "Remove selected item"       ,POPUP_TRV_FILES_REMOVE_ITEMS
+    MENUITEM "Clean all"                  ,POPUP_TRV_FILES_CLEAN_ALL
+    MENUITEM SEPARATOR
+    MENUITEM "Open Path"                  ,POPUP_TRV_FILES_OPEN_PATH
+    MENUITEM "Auto search"                ,POPUP_TRV_FILES_AUTO_SEARCH
+    MENUITEM "Auto search (Path)"         ,POPUP_TRV_FILES_AUTO_SEARCH_PATH
+    MENUITEM "Import list"                ,POPUP_TRV_FILES_LOAD_LIST
+    MENUITEM "Export list"                ,POPUP_TRV_FILES_SAVE_LIST
+    MENUITEM SEPARATOR
+    MENUITEM "Backup all files to ZIP"     ,POPUP_TRV_FILES_BACKUP
+    MENUITEM "Backup all files from path"  ,POPUP_TRV_FILES_BACKUP_PATH
+  END
+END
+//------------------------------------------------------------------------------
+//popup test menu
+//------------------------------------------------------------------------------
+POPUP_TRV_TEST MENU DISCARDABLE
+BEGIN
+  POPUP "POPUP_TRV_TEST"
+  BEGIN
+    MENUITEM "Check all"                  ,POPUP_TRV_CHECK_ALL
+    MENUITEM "Uncheck all"                ,POPUP_TRV_UNCHECK_ALL
+    MENUITEM SEPARATOR
+    MENUITEM "Stop the test"              ,POPUP_TRV_STOP_TEST
+  END
+END
+//------------------------------------------------------------------------------
+//popup lstv
+//------------------------------------------------------------------------------
+POPUP_LSTV MENU DISCARDABLE
+BEGIN
+  POPUP "LSTV"
+    BEGIN
+      MENUITEM "Save view"                 ,POPUP_S_VIEW
+      MENUITEM "Save Selection"            ,POPUP_S_SELECTION
+      MENUITEM SEPARATOR
+      MENUITEM "Select all line in search" ,POPUP_A_SEARCH
+      MENUITEM SEPARATOR
+      MENUITEM "Open path"                 ,POPUP_O_PATH
+      MENUITEM SEPARATOR
+      MENUITEM "Copy the line to clipboard",POPUP_CP_LINE
+      POPUP "Copy to clipboard"
+      BEGIN
+        MENUITEM "",POPUP_I_00
+        MENUITEM "",POPUP_I_01
+        MENUITEM "",POPUP_I_02
+        MENUITEM "",POPUP_I_03
+        MENUITEM "",POPUP_I_04
+        MENUITEM "",POPUP_I_05
+        MENUITEM "",POPUP_I_06
+        MENUITEM "",POPUP_I_07
+        MENUITEM "",POPUP_I_08
+        MENUITEM "",POPUP_I_09
+        MENUITEM "",POPUP_I_10
+        MENUITEM "",POPUP_I_11
+        MENUITEM "",POPUP_I_12
+        MENUITEM "",POPUP_I_13
+        MENUITEM "",POPUP_I_14
+        MENUITEM "",POPUP_I_15
+        MENUITEM "",POPUP_I_16
+        MENUITEM "",POPUP_I_17
+        MENUITEM "",POPUP_I_18
+        MENUITEM "",POPUP_I_19
+      END
+    END
+END
+//------------------------------------------------------------------------------
+POPUP_LSTV_EMPTY_FILE MENU DISCARDABLE
+BEGIN
+  POPUP "LSTV"
+    BEGIN
+      MENUITEM "Load file"                      ,POPUP_FILE_IMPORT_FILE
+    END
+END
+//------------------------------------------------------------------------------
+POPUP_SELECT_ALL_SESSION MENU DISCARDABLE
+BEGIN
+  POPUP "LSTV"
+    BEGIN
+      MENUITEM "Select/Unselect  all"           ,SELECT_ALL_SESSION
+    END
+END
+POPUP_SELECT_ALL_TEST MENU DISCARDABLE
+BEGIN
+  POPUP "LSTV"
+    BEGIN
+      MENUITEM "Select/Unselect all"            ,SELECT_ALL_TEST
+    END
+END
+//------------------------------------------------------------------------------
+//popup header hlstv_process
+//------------------------------------------------------------------------------
+POPUP_LSTV_HDR MENU DISCARDABLE
+BEGIN
+  POPUP "LSTV"
+    BEGIN
+      MENUITEM "",POPUP_H_00
+      MENUITEM "",POPUP_H_01
+      MENUITEM "",POPUP_H_02
+      MENUITEM "",POPUP_H_03
+      MENUITEM "",POPUP_H_04
+      MENUITEM "",POPUP_H_05
+      MENUITEM "",POPUP_H_06
+      MENUITEM "",POPUP_H_07
+      MENUITEM "",POPUP_H_08
+      MENUITEM "",POPUP_H_09
+      MENUITEM "",POPUP_H_10
+      MENUITEM "",POPUP_H_11
+      MENUITEM "",POPUP_H_12
+      MENUITEM "",POPUP_H_13
+      MENUITEM "",POPUP_H_14
+      MENUITEM "",POPUP_H_15
+      MENUITEM "",POPUP_H_16
+      MENUITEM "",POPUP_H_17
+      MENUITEM "",POPUP_H_18
+      MENUITEM "",POPUP_H_19
+    END
+END
+//------------------------------------------------------------------------------
+POPUP_LSTV_PROCESS MENU DISCARDABLE
+BEGIN
+  POPUP "PROCESS"
+  BEGIN
+    MENUITEM "Refresh"                   ,POPUP_PROCESS_REFRESH
+    MENUITEM "Save view"                 ,POPUP_S_VIEW
+    MENUITEM "Open path"                 ,POPUP_OPEN_PATH
+    MENUITEM SEPARATOR
+    MENUITEM "Kill process"              ,POPUP_KILL_PROCESS
+    MENUITEM "Dump process memory"       ,POPUP_DUMP_MEMORY
+    MENUITEM SEPARATOR
+    MENUITEM "VirusTotal check file"     ,POPUP_VIRUSTOTAL_CHECK
+    MENUITEM "VirusTotal check all files",POPUP_VIRUSTOTAL_CHECK_ALL
+    MENUITEM SEPARATOR
+    MENUITEM "Check this process in RootKit DB"     ,POPUP_CHECK_ROOTKIT_PROCESS
+    MENUITEM "Check All process in RootKit DB"      ,POPUP_CHECK_ALL_ROOTKIT_PROCESS
+    MENUITEM "Add process to RootKit DB"            ,POPUP_ADD_ROOTKIT_PROCESS
+    MENUITEM SEPARATOR
+    POPUP "Dll injection"
+    BEGIN
+      MENUITEM "Add remote thread injection"        ,POPUP_ADD_DLL_INJECT_REMOTE_THREAD
+      MENUITEM "Remove remote thread injection"     ,POPUP_REM_DLL_INJECT_REMOTE_THREAD
+    END
+    MENUITEM SEPARATOR
+    MENUITEM "Copy the line to clipboard",POPUP_CP_LINE
+    POPUP "Copy to clipboard"
+    BEGIN
+      MENUITEM "",POPUP_I_00
+      MENUITEM "",POPUP_I_01
+      MENUITEM "",POPUP_I_02
+      MENUITEM "",POPUP_I_03
+      MENUITEM "",POPUP_I_04
+      MENUITEM "",POPUP_I_05
+      MENUITEM "",POPUP_I_06
+      MENUITEM "",POPUP_I_07
+      MENUITEM "",POPUP_I_08
+      MENUITEM "",POPUP_I_09
+      MENUITEM "",POPUP_I_10
+      MENUITEM "",POPUP_I_11
+      MENUITEM "",POPUP_I_12
+      MENUITEM "",POPUP_I_13
+      MENUITEM "",POPUP_I_14
+      MENUITEM "",POPUP_I_15
+      MENUITEM "",POPUP_I_16
+      MENUITEM "",POPUP_I_17
+      MENUITEM "",POPUP_I_18
+    END
+  END
+END
+//------------------------------------------------------------------------------
+POPUP_LSTV_SNIFF MENU DISCARDABLE
+BEGIN
+  POPUP "POPUP_LSTV_SNIFF"
+  BEGIN
+      MENUITEM "Filter by source IP"              ,POPUP_SNIFF_FILTRE_IP_SRC
+      MENUITEM "Filter by destination IP"         ,POPUP_SNIFF_FILTRE_IP_DST
+      MENUITEM SEPARATOR
+      MENUITEM "Filter by source port"            ,POPUP_SNIFF_FILTRE_PORT_SRC
+      MENUITEM "Filter by destination port"       ,POPUP_SNIFF_FILTRE_PORT_DST
+      MENUITEM SEPARATOR
+      MENUITEM "Follow TCP/UDP stream"            ,POPUP_LINK
+
+      MENUITEM SEPARATOR
+      MENUITEM "Save view"                        ,POPUP_S_VIEW
+      MENUITEM "Save Selection"                   ,POPUP_S_SELECTION
+  END
+END
+//------------------------------------------------------------------------------
+POPUP_SQLITE_REQUEST MENU DISCARDABLE
+BEGIN
+  POPUP "Popup_sqlite_request"
+    BEGIN
+      MENUITEM "SELECT"                           ,POPUP_SQLITE_REQUEST_SELECT //"SELECT * FROM table;"
+      MENUITEM "INSERT"                           ,POPUP_SQLITE_REQUEST_INSERT //"INSERT INTO table (param1,param2) VALUES(\"data1\",\"data2\");"
+      MENUITEM "DELETE"                           ,POPUP_SQLITE_REQUEST_DELETE //"DELETE FROM table WHERE value=\"1\";"
+      MENUITEM SEPARATOR
+      MENUITEM "ALTER TABLE"                      ,POPUP_SQLITE_REQUEST_ALTER_TABLE
+      MENUITEM "CREATE TABLE"                     ,POPUP_SQLITE_REQUEST_CREATE_TABLE
+      MENUITEM "INSERT INTO"                      ,POPUP_SQLITE_REQUEST_INSERT_INTO
+      MENUITEM "DROP TABLE"                       ,POPUP_SQLITE_REQUEST_DROP_TABLE
+      MENUITEM SEPARATOR
+      MENUITEM "Compact database"                 ,POPUP_SQLITE_REQUEST_VACCUM //"VACUUM;"
+      MENUITEM "Enable transaction journal"       ,POPUP_SQLITE_REQUEST_JOURNAL_ON //"PRAGMA journal_mode = ON;"
+      MENUITEM "Disable transaction journal"      ,POPUP_SQLITE_REQUEST_JOURNAL_OFF //"PRAGMA journal_mode = OFF;"
+      MENUITEM "Begin transaction"                ,POPUP_SQLITE_REQUEST_BEGIN_TRANSACTION //"BEGIN TRANSACTION;"
+      MENUITEM "End transaction"                  ,POPUP_SQLITE_REQUEST_END_TRANSACTION //"END TRANSACTION;"
+    END
+END
+//------------------------------------------------------------------------------
+POPUP_TV_REGISTRY MENU DISCARDABLE
+BEGIN
+  POPUP "Popup_tv"
+    BEGIN
+      MENUITEM "Copy complet path"                 ,POPUP_TV_CP_COMPLET_PATH
+      MENUITEM "Copy value and data"               ,POPUP_TV_CP_VALUE_AND_DATA
+    END
+END
+//------------------------------------------------------------------------------
+//popup lstv
+//------------------------------------------------------------------------------
+POPUP_LSTV_REGISTRY MENU DISCARDABLE
+BEGIN
+  POPUP "Popup_lv"
+    BEGIN
+      MENUITEM "Save view"                 ,POPUP_S_VIEW
+      MENUITEM "Save Selection"            ,POPUP_S_SELECTION
+      MENUITEM SEPARATOR
+      MENUITEM "Select all line in search" ,POPUP_A_SEARCH
+      MENUITEM SEPARATOR
+      MENUITEM "Open path"                 ,POPUP_O_PATH
+      MENUITEM SEPARATOR
+      MENUITEM "Copy the line to clipboard",POPUP_CP_LINE
+      POPUP "Copy to clipboard"
+      BEGIN
+        MENUITEM "File",POPUP_I_00
+        MENUITEM "Key",POPUP_I_01
+        MENUITEM "Value",POPUP_I_02
+        MENUITEM "Data",POPUP_I_03
+        MENUITEM "Type",POPUP_I_04
+        MENUITEM "Parent key update (UTC)",POPUP_I_05
+        MENUITEM "Owner SID",POPUP_I_06
+      END
+    END
+END
+//------------------------------------------------------------------------------
+//sqlite
+//------------------------------------------------------------------------------
+POPUP_LSTV_SQLITE MENU DISCARDABLE
+BEGIN
+  POPUP "Popup_sqlite"
+    BEGIN
+      MENUITEM "Save view"                 ,POPUP_S_VIEW
+      MENUITEM "Save Selection"            ,POPUP_S_SELECTION
+      MENUITEM SEPARATOR
+      MENUITEM "Select all line in search" ,POPUP_A_SEARCH
+      MENUITEM SEPARATOR
+      MENUITEM "Auto resize all columns"  , POPUP_SQLITE_HDR_RESIZE
+      MENUITEM "All line datas"           , POPUP_SQLITE_INFOS
+      MENUITEM SEPARATOR
+      MENUITEM "Delete item"              , POPUP_SQLITE_REMOVE
+      MENUITEM SEPARATOR
+      MENUITEM "Edit TABLE"               , POPUP_SQLITE_ED_TABLE
+    END
+END
+//------------------------------------------------------------------------------
+//popup screenshot
+//------------------------------------------------------------------------------
+MY_POPUP_SCREENSHOT MENU DISCARDABLE
+BEGIN
+     POPUP "MY_POPUP"
+     BEGIN
+       MENUITEM "Screenshot\tPrint screen", MSG_SCREENSHOT
+//       MENUITEM "Screenshot window\tPause", MSG_SCREENSHOT_WINDOW
+        MENUITEM "Disable screenshot"     ,BT_SREEENSHOT
+     END
+END
